@@ -25,13 +25,15 @@ public class Wand : MonoBehaviour
 
             accel = new Vector3(float.Parse(splitData[1]), float.Parse(splitData[2]), float.Parse(splitData[3]));
             gyro = new Vector3(float.Parse(splitData[4]), float.Parse(splitData[5]), float.Parse(splitData[6]));
-            orientation = new Quaternion(float.Parse(splitData[7]), float.Parse(splitData[8]), float.Parse(splitData[9]), float.Parse(splitData[10]));
+            orientation = new Quaternion(float.Parse(splitData[8]), float.Parse(splitData[9]), float.Parse(splitData[10]), float.Parse(splitData[7]));
 
             Vector3 euler = orientation.eulerAngles;
 
             Debug.Log("Acceleration = " + accel);
             Debug.Log("Gyro = " + gyro);
             Debug.Log("Orientation = " + euler);
+
+            transform.rotation = orientation;
         }
         else
         {
