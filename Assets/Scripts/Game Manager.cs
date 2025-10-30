@@ -7,7 +7,6 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public Image instruction;
-    public Image instructionsPanel;
     public JoyconWand jWand;
     public Spellbook spellbook;
     public float holdPoseTime;
@@ -25,7 +24,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         instruction.gameObject.SetActive(false);
-        CreateQuestion();
+        StartCoroutine(CreateQuestion());
     }
     public void SetSpell(Spell spell)
     {
@@ -137,50 +136,50 @@ public class GameManager : MonoBehaviour
         {
             case Pose.Forward:
                 instruction.sprite = poseInstructions[0];
-
+                instruction.rectTransform.localScale = new Vector3(-1, 1, 1);
                 break;
             case Pose.UpHigh:
                 instruction.sprite = poseInstructions[1];
-
+                instruction.rectTransform.localScale = new Vector3(-1, 1, 1);
                 break;
             case Pose.UpCenter:
                 instruction.sprite = poseInstructions[2];
-
                 break;
             case Pose.Down:
                 instruction.sprite = poseInstructions[3];
-
+                instruction.rectTransform.localScale = new Vector3(-1, 1, 1);
                 break;
             case Pose.RightMain:
                 instruction.sprite = poseInstructions[4];
-
+                instruction.rectTransform.localScale = new Vector3(-1, 1, 1);
                 break;
             case Pose.RightOff:
                 instruction.sprite = poseInstructions[5];
-                
+                instruction.rectTransform.localScale = new Vector3(1, 1, 1);
                 break;
             case Pose.RightLow:
                 instruction.sprite = poseInstructions[7];
-
+                instruction.rectTransform.localScale = new Vector3(1, 1, 1);
                 break;
             case Pose.RightCenter:
                 instruction.sprite = poseInstructions[6];
-                
+                instruction.rectTransform.localScale = new Vector3(-1, 1, 1);
                 break;
             case Pose.LeftMain:
                 instruction.sprite = poseInstructions[4];
-                
+                instruction.rectTransform.localScale = new Vector3(1, 1, 1);
                 break;
             case Pose.LeftOff:
                 instruction.sprite = poseInstructions[5];
+                instruction.rectTransform.localScale = new Vector3(-1, 1, 1);
                 break;
             case Pose.LeftLow:
                 instruction.sprite = poseInstructions[7];
-                
+                instruction.rectTransform.localScale = new Vector3(1, 1, 1);
                 break;
             case Pose.LeftCenter:
                 instruction.sprite = poseInstructions[6];
-                
+                instruction.rectTransform.localScale = new Vector3(-1, 1, 1);
                 break;
             default:
                 break;
@@ -317,82 +316,94 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
         StartCoroutine(SolveQuestion(spell));
     }
-    private void CreateQuestion()
+    private IEnumerator CreateQuestion()
     {
         questionIndex = (int)Random.Range(0, questions.Count);
 
         // Send question string to UI
-
+        yield return new WaitForSeconds(1f);
         // Set game state to await spell selection
         spellbook.SpellSelection();
     }
     private IEnumerator SolveQuestion(Spell spell)
     {
         bool success = false;
-        switch (questionIndex)
+
+        if (!(spell == Spell.Forget || spell == Spell.Quit || spell == Spell.Calibrate))
         {
-            case 0:
-                for (int i = 0; i < answer0.Count; i++)
-                {
-                    if (spell == answer0[i])
+            switch (questionIndex)
+            {
+                case 0:
+                    for (int i = 0; i < answer0.Count; i++)
                     {
-                        success = true;
-                        break;
+                        if (spell == answer0[i])
+                        {
+                            success = true;
+                            break;
+                        }
                     }
-                }
-                break;
-            case 1:
-                for (int i = 0; i < answer1.Count; i++)
-                {
-                    if (spell == answer1[i])
+                    break;
+                case 1:
+                    for (int i = 0; i < answer1.Count; i++)
                     {
-                        success = true;
-                        break;
+                        if (spell == answer1[i])
+                        {
+                            success = true;
+                            break;
+                        }
                     }
-                }
-                break;
-            case 2:
-                for (int i = 0; i < answer2.Count; i++)
-                {
-                    if (spell == answer2[i])
+                    break;
+                case 2:
+                    for (int i = 0; i < answer2.Count; i++)
                     {
-                        success = true;
-                        break;
+                        if (spell == answer2[i])
+                        {
+                            success = true;
+                            break;
+                        }
                     }
-                }
-                break;
-            case 3:
-                for (int i = 0; i < answer3.Count; i++)
-                {
-                    if (spell == answer3[i])
+                    break;
+                case 3:
+                    for (int i = 0; i < answer3.Count; i++)
                     {
-                        success = true;
-                        break;
+                        if (spell == answer3[i])
+                        {
+                            success = true;
+                            break;
+                        }
                     }
-                }
-                break;
-            case 4:
-                for (int i = 0; i < answer4.Count; i++)
-                {
-                    if (spell == answer4[i])
+                    break;
+                case 4:
+                    for (int i = 0; i < answer4.Count; i++)
                     {
-                        success = true;
-                        break;
+                        if (spell == answer4[i])
+                        {
+                            success = true;
+                            break;
+                        }
                     }
-                }
-                break;
+                    break;
+            }
+            if (success)
+            {
+                // cheer
+            }
+            else
+            {
+                // sad
+            }
+            yield return new WaitForSeconds(1f);
+            CreateQuestion();
         }
-        if (success)
+        else if (spell != Spell.Quit) 
         {
-            // cheer
+            yield return new WaitForSeconds(1f);
+            spellbook.SpellSelection();
         }
         else
         {
-            // sad
+            Application.Quit();
         }
-
-        yield return new WaitForSeconds(1f);
-        CreateQuestion();
 
     }
 }
