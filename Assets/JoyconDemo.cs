@@ -71,9 +71,8 @@ public class JoyconDemo : MonoBehaviour {
 
             // Accel values:  x, y, z axis values (in Gs)
             accel = j.GetAccel();
-
-            orientation = j.GetVector();
-			orientation.eulerAngles = new Vector3(orientation.eulerAngles.x, orientation.eulerAngles.z + 180, orientation.eulerAngles.y+180);
+			orientation = Quaternion.Euler(90f, 0f, 0f) * j.GetVector();
+			//orientation.eulerAngles = new Vector3(orientation.eulerAngles.x, orientation.eulerAngles.z + 180, orientation.eulerAngles.y+180);
 			Debug.Log(orientation.ToString());
 			if (j.GetButton(Joycon.Button.DPAD_UP)){
 				gameObject.GetComponent<Renderer>().material.color = Color.red;
