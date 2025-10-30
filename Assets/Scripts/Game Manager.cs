@@ -1,65 +1,265 @@
-using System;
+using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum Pattern { spell1, spell2, spell3}
 public class GameManager : MonoBehaviour
 {
-    public Image arrow;
+    public Image instruction;
     public Image instructionsPanel;
     public JoyconWand jWand;
+    public Spellbook spellbook;
     public float holdPoseTime;
+    public List<Sprite> poseInstructions;
+    public List<string> questions;
+    public List<Spell> answer0;
+    public List<Spell> answer1;
+    public List<Spell> answer2;
+    public List<Spell> answer3;
+    public List<Spell> answer4;
 
-    private Pattern target;
-
+    private int questionIndex;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        arrow.gameObject.SetActive(false);
-        StartCoroutine(SetPose());
+        instruction.gameObject.SetActive(false);
+        CreateQuestion();
     }
-    private void SetInstructions(Direction dir)
+    public void SetSpell(Spell spell)
     {
-        switch (dir)
+        StartCoroutine(PerformSpell(spell));
+    }
+    IEnumerator PerformSpell(Spell spell)
+    {
+        // Show point forward 
+
+        yield return new WaitForSeconds(1f);
+        yield return StartCoroutine(HoldPose(Pose.Forward));
+        jWand.Recalibrate();
+        switch (spell)
         {
-            case Direction.forward:
-                arrow.transform.eulerAngles = new Vector3(-110, 0, 0);
+            case Spell.Forget:
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.Forward));
                 break;
-            case Direction.down:
-                arrow.transform.eulerAngles = new Vector3(0, 0, 0);
+            case Spell.Burly:
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.Down));
                 break;
-            case Direction.right:
-                arrow.transform.eulerAngles = new Vector3(0, 0, 90);
+            case Spell.Smiley:
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
                 break;
-            case Direction.up:
-                arrow.transform.eulerAngles = new Vector3(0, 0, 180);
+            case Spell.Rage:
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.Down));
                 break;
-            case Direction.left:
-                arrow.transform.eulerAngles = new Vector3(0, 0, 270);
+            case Spell.Teleport:
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
                 break;
-            case Direction.back:
-                arrow.transform.eulerAngles = new Vector3(70, 0, 0);
+            case Spell.Mustache:
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                break;
+            case Spell.Dispel:
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.Forward));
+                jWand.Recalibrate();
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                break;
+            case Spell.Charm:
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.Forward));
+                jWand.Recalibrate();
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.Forward));
+                jWand.Recalibrate();
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                break;
+            case Spell.Laser:
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                break;
+            case Spell.Quit:
+                yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                break;
+            case Spell.Calibrate:
+                yield return StartCoroutine(HoldPose(Pose.Forward));
+                jWand.Recalibrate();
+                break;
+        }
+        StartCoroutine(CastSpell(spell));
+    }
+    private void SetInstructions(Pose pose)
+    {
+        switch (pose)
+        {
+            case Pose.Forward:
+                instruction.sprite = poseInstructions[0];
+
+                break;
+            case Pose.UpHigh:
+                instruction.sprite = poseInstructions[1];
+
+                break;
+            case Pose.UpCenter:
+                instruction.sprite = poseInstructions[2];
+
+                break;
+            case Pose.Down:
+                instruction.sprite = poseInstructions[3];
+
+                break;
+            case Pose.RightMain:
+                instruction.sprite = poseInstructions[4];
+
+                break;
+            case Pose.RightOff:
+                instruction.sprite = poseInstructions[5];
+                
+                break;
+            case Pose.RightLow:
+                instruction.sprite = poseInstructions[7];
+
+                break;
+            case Pose.RightCenter:
+                instruction.sprite = poseInstructions[6];
+                
+                break;
+            case Pose.LeftMain:
+                instruction.sprite = poseInstructions[4];
+                
+                break;
+            case Pose.LeftOff:
+                instruction.sprite = poseInstructions[5];
+                break;
+            case Pose.LeftLow:
+                instruction.sprite = poseInstructions[7];
+                
+                break;
+            case Pose.LeftCenter:
+                instruction.sprite = poseInstructions[6];
+                
                 break;
             default:
                 break;
         }
-        arrow.gameObject.SetActive(true);
     }
+    IEnumerator HoldPose(Pose pose)
+    {
+        Direction dir = Direction.forward;
+        switch (pose)
+        {
+            case Pose.Forward:
+                dir = Direction.forward;
+                break;
+            case Pose.UpHigh:
+                dir = Direction.up;
+                break;
+            case Pose.UpCenter:
+                dir = Direction.up;
+                break;
+            case Pose.Down:
+                dir = Direction.down;
+                break;
+            case Pose.RightMain:
+                dir = Direction.right;
+                break;
+            case Pose.RightOff:
+                dir = Direction.right;
+                break;
+            case Pose.RightLow:
+                dir = Direction.right;
+                break;
+            case Pose.RightCenter:
+                dir = Direction.right;
+                break;
+            case Pose.LeftMain:
+                dir = Direction.left;
+                break;
+            case Pose.LeftOff:
+                dir = Direction.left;
+                break;
+            case Pose.LeftLow:
+                dir = Direction.left;
+                break;
+            case Pose.LeftCenter:
+                dir = Direction.left;
+                break;
+        }
 
+        float timer = 0f;
+        SetInstructions(pose);
+        while (timer < holdPoseTime)
+        {
+            if (jWand.GetDirection() == dir)
+            {
+                timer += Time.deltaTime;
+            }
+            else if (timer > 0f)
+            {
+                timer -= Time.deltaTime;
+            }
+            timer = Mathf.Clamp(timer, 0f, holdPoseTime);
+            yield return null;
+        }
+        yield return StartCoroutine(CompletePose());
+    }
+    
+    /*
     IEnumerator SetPose()
     {
-        Pattern[] patValues = (Pattern[])Enum.GetValues(typeof(Pattern));
+        Spell[] patValues = (Spell[])Enum.GetValues(typeof(Spell));
         int index = UnityEngine.Random.Range(0, patValues.Length);
         target = patValues[index];
-
+        
         arrow.transform.eulerAngles = new Vector3(-110, 0, 0);
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         yield return StartCoroutine(HoldPose(Direction.forward));
         jWand.Recalibrate();
-
+        
         switch (target)
         {
             case Pattern.spell1:
@@ -79,28 +279,120 @@ public class GameManager : MonoBehaviour
                 break;
         }
         StartCoroutine(SetPose());
-    }
-    IEnumerator HoldPose(Direction dir)
-    {
-        float timer = 0f;
-        SetInstructions(dir);
-        while (timer < holdPoseTime) {
-            if (jWand.GetDirection() == dir)
-            {
-                timer += Time.deltaTime;
-            }
-            else if (timer > 0f)
-            {
-                timer -= Time.deltaTime;
-            }
-            timer = Mathf.Clamp(timer, 0f, holdPoseTime);
-            yield return null;
-        }
-        yield return StartCoroutine(CompletePose());
-    }
+    }*/
+
     IEnumerator CompletePose()
     {
-        arrow.gameObject.SetActive(false);
+        instruction.gameObject.SetActive(false);
         yield return new WaitForSeconds(1f);
+    }
+    IEnumerator CastSpell(Spell spell)
+    {
+        switch (spell)
+        {
+            case Spell.Forget:
+                break;
+            case Spell.Burly:
+                break;
+            case Spell.Smiley:
+                break;
+            case Spell.Rage:
+                break;
+            case Spell.Teleport:
+                break;
+            case Spell.Mustache:
+                break;
+            case Spell.Dispel:
+                break;
+            case Spell.Charm:
+                break;
+            case Spell.Laser:
+                break;
+            case Spell.Quit:
+                break;
+            case Spell.Calibrate:
+                break;
+        }
+
+        yield return new WaitForSeconds(2f);
+        StartCoroutine(SolveQuestion(spell));
+    }
+    private void CreateQuestion()
+    {
+        questionIndex = (int)Random.Range(0, questions.Count);
+
+        // Send question string to UI
+
+        // Set game state to await spell selection
+        spellbook.SpellSelection();
+    }
+    private IEnumerator SolveQuestion(Spell spell)
+    {
+        bool success = false;
+        switch (questionIndex)
+        {
+            case 0:
+                for (int i = 0; i < answer0.Count; i++)
+                {
+                    if (spell == answer0[i])
+                    {
+                        success = true;
+                        break;
+                    }
+                }
+                break;
+            case 1:
+                for (int i = 0; i < answer1.Count; i++)
+                {
+                    if (spell == answer1[i])
+                    {
+                        success = true;
+                        break;
+                    }
+                }
+                break;
+            case 2:
+                for (int i = 0; i < answer2.Count; i++)
+                {
+                    if (spell == answer2[i])
+                    {
+                        success = true;
+                        break;
+                    }
+                }
+                break;
+            case 3:
+                for (int i = 0; i < answer3.Count; i++)
+                {
+                    if (spell == answer3[i])
+                    {
+                        success = true;
+                        break;
+                    }
+                }
+                break;
+            case 4:
+                for (int i = 0; i < answer4.Count; i++)
+                {
+                    if (spell == answer4[i])
+                    {
+                        success = true;
+                        break;
+                    }
+                }
+                break;
+        }
+        if (success)
+        {
+            // cheer
+        }
+        else
+        {
+            // sad
+        }
+
+        yield return new WaitForSeconds(1f);
+        CreateQuestion();
+
     }
 }
