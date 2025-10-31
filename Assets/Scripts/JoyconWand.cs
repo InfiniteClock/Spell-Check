@@ -56,7 +56,7 @@ public class JoyconWand : MonoBehaviour
             gameObject.transform.rotation = orientation;
 
             Direction dir = GetDirection();
-            Debug.Log(dir);
+            //Debug.Log(dir);
         }
     }
 

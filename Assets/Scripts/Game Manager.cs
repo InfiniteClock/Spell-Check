@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +10,7 @@ public class GameManager : MonoBehaviour
     public Image instruction;
     public JoyconWand jWand;
     public Spellbook spellbook;
+    public TextMeshProUGUI studentText;
     public float holdPoseTime;
     public List<Sprite> poseInstructions;
     public List<string> questions;
@@ -24,7 +26,52 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         instruction.gameObject.SetActive(false);
-        StartCoroutine(CreateQuestion());
+        StartCoroutine(Tutorial());
+    }
+    private IEnumerator Tutorial()
+    {
+        string m1 = "Welcome to ___ professor! \n Do you remember what you were teaching us?";
+        string text = "";
+        for(int i = 0; i < m1.Length; i++)
+        {
+            text += m1[i];
+            studentText.text = text;
+            yield return new WaitForSeconds(0.05f);
+        }
+        yield return new WaitForSeconds(5f);
+
+        string m2 = "Hold your wand to a spell in you book to choose it!";
+        text = "";
+        for (int i = 0; i < m2.Length; i++)
+        {
+            text += m2[i];
+            studentText.text = text;
+            yield return new WaitForSeconds(0.05f);
+        }
+        yield return new WaitForSeconds(5f);
+
+        string m3 = "Once you have a spell charged, perform the actions on screen to cast it!";
+        text = "";
+        for (int i = 0; i < m3.Length; i++)
+        {
+            text += m3[i];
+            studentText.text = text;
+            yield return new WaitForSeconds(0.05f);
+        }
+        yield return new WaitForSeconds(5f);
+
+        string m4 = "Try casting a spell now!";
+        text = "";
+        for (int i = 0; i < m4.Length; i++)
+        {
+            text += m4[i];
+            studentText.text = text;
+            yield return new WaitForSeconds(0.05f);
+        }
+        yield return new WaitForSeconds(5f);
+
+        questionIndex = -1;
+        spellbook.SpellSelection();
     }
     public void SetSpell(Spell spell)
     {
@@ -33,7 +80,6 @@ public class GameManager : MonoBehaviour
     IEnumerator PerformSpell(Spell spell)
     {
         // Show point forward 
-
         yield return new WaitForSeconds(1f);
         yield return StartCoroutine(HoldPose(Pose.Forward));
         jWand.Recalibrate();
@@ -124,14 +170,25 @@ public class GameManager : MonoBehaviour
                 yield return StartCoroutine(HoldPose(Pose.UpCenter));
                 break;
             case Spell.Calibrate:
+                string temp = studentText.text;
+                studentText.text = "Point your wand at the screen! Calibrating in \n3...";
+                yield return new WaitForSeconds(1f);
+                studentText.text = "Point your wand at the screen! Calibrating in \n2...";
+                yield return new WaitForSeconds(1f);
+                studentText.text = "Point your wand at the screen! Calibrating in \n1...";
+                yield return new WaitForSeconds(1f);
+                studentText.text = "Calibrating now!";
                 yield return StartCoroutine(HoldPose(Pose.Forward));
                 jWand.Recalibrate();
+                yield return new WaitForSeconds(1f);
+                studentText.text = temp;
                 break;
         }
         StartCoroutine(CastSpell(spell));
     }
     private void SetInstructions(Pose pose)
     {
+
         switch (pose)
         {
             case Pose.Forward:
@@ -184,6 +241,7 @@ public class GameManager : MonoBehaviour
             default:
                 break;
         }
+        instruction.gameObject.SetActive(true);
     }
     IEnumerator HoldPose(Pose pose)
     {
@@ -283,33 +341,45 @@ public class GameManager : MonoBehaviour
     IEnumerator CompletePose()
     {
         instruction.gameObject.SetActive(false);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.1f);
     }
     IEnumerator CastSpell(Spell spell)
     {
+        instruction.GetComponentInParent<Image>().gameObject.SetActive(false);
         switch (spell)
         {
             case Spell.Forget:
+                yield return null;
                 break;
             case Spell.Burly:
+                yield return null;
                 break;
             case Spell.Smiley:
+                yield return null;
                 break;
             case Spell.Rage:
+                yield return null;
                 break;
             case Spell.Teleport:
+                yield return null;
                 break;
             case Spell.Mustache:
+                yield return null;
                 break;
             case Spell.Dispel:
+                yield return null;
                 break;
             case Spell.Charm:
+                yield return null;
                 break;
             case Spell.Laser:
+                yield return null;
                 break;
             case Spell.Quit:
+                yield return null;
                 break;
             case Spell.Calibrate:
+                yield return null;
                 break;
         }
 
@@ -319,8 +389,15 @@ public class GameManager : MonoBehaviour
     private IEnumerator CreateQuestion()
     {
         questionIndex = (int)Random.Range(0, questions.Count);
-
+        string message = "";
+        studentText.text = message;
         // Send question string to UI
+        for (int i = 0; i < questions[questionIndex].Length; i++)
+        {
+            message += questions[questionIndex][i];
+            studentText.text = message;
+            yield return new WaitForSeconds(0.05f);
+        }
         yield return new WaitForSeconds(1f);
         // Set game state to await spell selection
         spellbook.SpellSelection();
@@ -333,6 +410,9 @@ public class GameManager : MonoBehaviour
         {
             switch (questionIndex)
             {
+                case -1:
+                    success = true;
+                    break;
                 case 0:
                     for (int i = 0; i < answer0.Count; i++)
                     {
@@ -384,24 +464,48 @@ public class GameManager : MonoBehaviour
                     }
                     break;
             }
+            
+            // Selects a message to give as feedback
+            string message = "";
             if (success)
             {
-                // cheer
+                message = "Wooh! \n Yeah! \n That's it!";
             }
             else
             {
-                // sad
+                message = "Are you sure? \n Hmm... \n Not quite it.";
             }
-            yield return new WaitForSeconds(1f);
-            CreateQuestion();
+            // Displays the message over time
+            string text = "";
+            for (int i = 0; i < message.Length; i++)
+            {
+                text += message[i];
+                studentText.text = text;
+                yield return new WaitForSeconds(0.05f);
+            }
+            yield return new WaitForSeconds(2f);
+            StartCoroutine(CreateQuestion());
         }
-        else if (spell != Spell.Quit) 
+        else if (spell == Spell.Calibrate) 
         {
             yield return new WaitForSeconds(1f);
             spellbook.SpellSelection();
         }
-        else
+        else if (spell == Spell.Forget)
         {
+            StartCoroutine(Tutorial());
+        }
+        else if (spell == Spell.Quit)
+        {
+            string message = "See you next time!";
+            string text = "";
+            for (int i = 0; i < message.Length; i++)
+            {
+                text += message[i];
+                studentText.text = text;
+                yield return new WaitForSeconds(0.05f);
+            }
+            yield return new WaitForSeconds(3f);
             Application.Quit();
         }
 
