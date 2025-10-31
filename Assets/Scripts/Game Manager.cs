@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,6 +11,8 @@ public class GameManager : MonoBehaviour
     public Spellbook spellbook;
     public TextMeshProUGUI studentText;
     public float holdPoseTime;
+    public Animator anim;
+
     public List<Sprite> poseInstructions;
     public List<string> questions;
     public List<Spell> answer0;
@@ -30,7 +31,7 @@ public class GameManager : MonoBehaviour
     }
     private IEnumerator Tutorial()
     {
-        string m1 = "Welcome to ___ professor! \n Do you remember what you were teaching us?";
+        string m1 = "Welcome to Check Your Spelling! \n Do you remember what you were teaching us?";
         string text = "";
         for(int i = 0; i < m1.Length; i++)
         {
@@ -40,7 +41,7 @@ public class GameManager : MonoBehaviour
         }
         yield return new WaitForSeconds(5f);
 
-        string m2 = "Hold your wand to a spell in you book to choose it!";
+        string m2 = "Hold your wand to a spell in your book to choose it!";
         text = "";
         for (int i = 0; i < m2.Length; i++)
         {
@@ -68,7 +69,7 @@ public class GameManager : MonoBehaviour
             studentText.text = text;
             yield return new WaitForSeconds(0.05f);
         }
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(1f);
 
         questionIndex = -1;
         spellbook.SpellSelection();
@@ -79,10 +80,13 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator PerformSpell(Spell spell)
     {
-        // Show point forward 
-        yield return new WaitForSeconds(1f);
-        yield return StartCoroutine(HoldPose(Pose.Forward));
-        jWand.Recalibrate();
+        // Show point forward unless recalibrating
+        if (spell != Spell.Calibrate)
+        {
+            yield return new WaitForSeconds(1f);
+            yield return StartCoroutine(HoldPose(Pose.Forward));
+            jWand.Recalibrate(); 
+        }
         switch (spell)
         {
             case Spell.Forget:
@@ -164,13 +168,31 @@ public class GameManager : MonoBehaviour
                 yield return StartCoroutine(HoldPose(Pose.UpHigh));
                 break;
             case Spell.Laser:
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.RightLow));
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.Down));
+                yield return StartCoroutine(HoldPose(Pose.Forward));
+                jWand.Recalibrate();
                 yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.Forward));
+                jWand.Recalibrate();
                 break;
             case Spell.Quit:
+                yield return StartCoroutine(HoldPose(Pose.UpHigh));
+                yield return StartCoroutine(HoldPose(Pose.Down));
                 yield return StartCoroutine(HoldPose(Pose.UpCenter));
+                yield return StartCoroutine(HoldPose(Pose.RightMain));
+                yield return StartCoroutine(HoldPose(Pose.LeftOff));
                 break;
             case Spell.Calibrate:
                 string temp = studentText.text;
+                instruction.sprite = poseInstructions[0];
+                instruction.rectTransform.localScale = new Vector3(-1, 1, 1);
+                instruction.gameObject.SetActive(true);
+
                 studentText.text = "Point your wand at the screen! Calibrating in \n3...";
                 yield return new WaitForSeconds(1f);
                 studentText.text = "Point your wand at the screen! Calibrating in \n2...";
@@ -178,6 +200,8 @@ public class GameManager : MonoBehaviour
                 studentText.text = "Point your wand at the screen! Calibrating in \n1...";
                 yield return new WaitForSeconds(1f);
                 studentText.text = "Calibrating now!";
+
+                jWand.Recalibrate();
                 yield return StartCoroutine(HoldPose(Pose.Forward));
                 jWand.Recalibrate();
                 yield return new WaitForSeconds(1f);
@@ -345,43 +369,57 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator CastSpell(Spell spell)
     {
-        instruction.GetComponentInParent<Image>().gameObject.SetActive(false);
+        instruction.GetComponentInParent<Image>().rectTransform.localScale = Vector3.zero;
         switch (spell)
         {
             case Spell.Forget:
-                yield return null;
+                anim.Play("Forget");
+                studentText.text = "Uh-oh!";
+                yield return new WaitForSeconds(1f);
+                studentText.text = "";
                 break;
             case Spell.Burly:
-                yield return null;
+                anim.Play("Wisp");
+                yield return new WaitForSeconds(1f); 
                 break;
             case Spell.Smiley:
-                yield return null;
+                anim.Play("Smile");
+                yield return new WaitForSeconds(1f); 
                 break;
             case Spell.Rage:
-                yield return null;
+                anim.Play("Star");
+                yield return new WaitForSeconds(1f); 
                 break;
             case Spell.Teleport:
-                yield return null;
+                anim.Play("Sparkle");
+                yield return new WaitForSeconds(1f); 
                 break;
             case Spell.Mustache:
-                yield return null;
+                anim.Play("Mustache");
+                yield return new WaitForSeconds(1f); 
                 break;
             case Spell.Dispel:
-                yield return null;
+                anim.Play("Diamond");
+                yield return new WaitForSeconds(1f); 
                 break;
             case Spell.Charm:
-                yield return null;
+                anim.Play("Heart");
+                yield return new WaitForSeconds(1f); 
                 break;
             case Spell.Laser:
-                yield return null;
+                anim.Play("Laser");
+                yield return new WaitForSeconds(1f); 
                 break;
             case Spell.Quit:
-                yield return null;
+                studentText.text = "Thanks for playing!";
+                anim.Play("Quit");
+                yield return new WaitForSeconds(1f); 
                 break;
             case Spell.Calibrate:
-                yield return null;
+                yield return new WaitForSeconds(1f); 
                 break;
         }
+        if (spell != Spell.Quit) anim.Play("Blank");
 
         yield return new WaitForSeconds(2f);
         StartCoroutine(SolveQuestion(spell));

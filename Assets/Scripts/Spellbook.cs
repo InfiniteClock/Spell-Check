@@ -37,6 +37,7 @@ public class Spellbook : MonoBehaviour
         {
             if (Input.anyKey || Input.GetMouseButton(0) || Input.GetMouseButton(1))
             {
+                // Forget
                 if (Input.GetKeyDown(KeyCode.F))
                 {
                     tempSelection = Spell.Forget;
@@ -44,6 +45,7 @@ public class Spellbook : MonoBehaviour
                     if (effects != null) StopCoroutine(effects);
                     effects = StartCoroutine(SpellPreview(tempSelection));
                 }
+                // Burly
                 if (Input.GetKeyDown(KeyCode.D))
                 {
                     tempSelection = Spell.Burly;
@@ -51,6 +53,7 @@ public class Spellbook : MonoBehaviour
                     if (effects != null) StopCoroutine(effects);
                     effects = StartCoroutine(SpellPreview(tempSelection));
                 }
+                // Smile
                 if (Input.GetKeyDown(KeyCode.S))
                 {
                     tempSelection = Spell.Smiley;
@@ -58,6 +61,7 @@ public class Spellbook : MonoBehaviour
                     if (effects != null) StopCoroutine(effects);
                     effects = StartCoroutine(SpellPreview(tempSelection));
                 }
+                // Rage
                 if (Input.GetKeyDown(KeyCode.W))
                 {
                     tempSelection = Spell.Rage;
@@ -65,6 +69,7 @@ public class Spellbook : MonoBehaviour
                     if (effects != null) StopCoroutine(effects);
                     effects = StartCoroutine(SpellPreview(tempSelection));
                 }
+                // Teleport
                 if (Input.GetMouseButtonDown(0))
                 {
                     tempSelection = Spell.Teleport;
@@ -72,6 +77,7 @@ public class Spellbook : MonoBehaviour
                     if (effects != null) StopCoroutine(effects);
                     effects = StartCoroutine(SpellPreview(tempSelection));
                 }
+                // Mustache
                 if (Input.GetKeyDown(KeyCode.UpArrow))
                 {
                     tempSelection = Spell.Mustache;
@@ -79,6 +85,7 @@ public class Spellbook : MonoBehaviour
                     if (effects != null) StopCoroutine(effects);
                     effects = StartCoroutine(SpellPreview(tempSelection));
                 }
+                // Dispel
                 if (Input.GetKeyDown(KeyCode.A))
                 {
                     tempSelection = Spell.Dispel;
@@ -86,6 +93,7 @@ public class Spellbook : MonoBehaviour
                     if (effects != null) StopCoroutine(effects);
                     effects = StartCoroutine(SpellPreview(tempSelection));
                 }
+                // Charm
                 if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
                     tempSelection = Spell.Charm;
@@ -93,6 +101,15 @@ public class Spellbook : MonoBehaviour
                     if (effects != null) StopCoroutine(effects);
                     effects = StartCoroutine(SpellPreview(tempSelection));
                 }
+                // Laser
+                if (Input.GetKeyDown(KeyCode.LeftArrow))
+                {
+                    tempSelection = Spell.Laser;
+                    timer = 0f;
+                    if (effects != null) StopCoroutine(effects);
+                    effects = StartCoroutine(SpellPreview(tempSelection));
+                }
+                // Quit 
                 if (Input.GetMouseButtonDown(1))
                 {
                     tempSelection = Spell.Quit;
@@ -100,6 +117,7 @@ public class Spellbook : MonoBehaviour
                     if (effects != null) StopCoroutine(effects);
                     effects = StartCoroutine(SpellPreview(tempSelection));
                 }
+                // Calibrate
                 if (Input.GetKeyDown(KeyCode.G))
                 {
                     tempSelection = Spell.Calibrate;
